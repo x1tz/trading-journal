@@ -1,25 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import supabase from './supabaseClient';
 import TradesTable from './components/TradesTable';
-import ResultsChart from './ResultsChart';
+import ResultsChart from './components/ResultsChart';
 
-const Dashboard = () => {
+const Dashboard = ({ darkMode, toggleDarkMode }) => {
   const [trades, setTrades] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
-
-  // Initialize dark mode from localStorage
-  useEffect(() => {
-    const isDark = localStorage.getItem('darkMode') === 'true';
-    setDarkMode(isDark);
-  }, []);
-
-  // Toggle dark mode and save to localStorage
-  const toggleDarkMode = () => {
-    const newMode = !darkMode;
-    setDarkMode(newMode);
-    localStorage.setItem('darkMode', newMode);
-  };
 
   const fetchTrades = async () => {
     setLoading(true);
@@ -53,78 +39,77 @@ const Dashboard = () => {
       ? ((winningTrades / totalTrades) * 100).toFixed(1)
       : 0;
 
-    const totalRR = trades.reduce((sum, trade) => sum + (parseFloat(trade.rr) || 0), 0);
+    const totalRR = trades.reduce((sum, trade) => sum + (parseFloat(trade.rr) || 0), 0).toFixed(1);
     const avgRR = trades.length > 0 ? (totalRR / trades.length).toFixed(2) : 0;
 
-    return { totalTrades, winRate, avgRR, chartData };
+    return { totalTrades, winRate, totalRR, chartData };
   };
 
   const stats = calculateStats();
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 dark:bg-gray-900">
-        {/* Dark Mode Toggle */}
-        <button
-          onClick={toggleDarkMode}
-          className="fixed bottom-4 right-4 p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg z-50"
-        >
-          {darkMode ? '🌞' : '🌙'}
-        </button>
+    <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Dark Mode Toggle */}
+      <button
+        onClick={toggleDarkMode}
+        className="fixed bottom-4 right-4 p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg z-50"
+      >
+        {darkMode ? '🌞' : '🌙'}
+      </button>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          {loading ? (
-            Array(4).fill().map((_, i) => (
-              <div 
-                key={i} 
-                className="animate-pulse bg-gray-100 dark:bg-gray-800 rounded-xl h-32"
-              />
-            ))
-          ) : (
-            <>
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md">
-                <div className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-2">
-                  Total Trades
-                </div>
-                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                  {stats.totalTrades}
-                </div>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {loading ? (
+          Array(4).fill().map((_, i) => (
+            <div 
+              key={i} 
+              className="animate-pulse bg-gray-100 dark:bg-gray-800 rounded-xl h-32"
+            />
+          ))
+        ) : (
+          <>
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md">
+              <div className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-2">
+                Total Trades
               </div>
-
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md">
-                <div className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-2">
-                  Win Rate
-                </div>
-                <div className="text-3xl font-bold text-green-600 dark:text-green-400">
-                  {stats.winRate}%
-                </div>
+              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                {stats.totalTrades}
               </div>
+            </div>
 
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md">
-                <div className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-2">
-                  Avg R:R
-                </div>
-                <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-                  {stats.avgRR}
-                </div>
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md">
+              <div className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-2">
+                Win Rate
               </div>
-
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 h-48">
-                <ResultsChart data={stats.chartData} darkMode={darkMode} />
+              <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+                {stats.winRate}%
               </div>
-            </>
-          )}
-        </div>
+            </div>
 
-        {/* Table Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-          {loading ? (
-            <div className="animate-pulse bg-gray-100 dark:bg-gray-700 h-64" />
-          ) : (
-            <TradesTable trades={trades} refreshTrades={fetchTrades} darkMode={darkMode} />
-          )}
-        </div>
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md">
+              <div className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-2">
+                Total R:R
+              </div>
+              <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                {stats.totalRR}
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 h-48">
+              <ResultsChart data={stats.chartData} darkMode={darkMode} />
+            </div>
+          </>
+        )}
+      </div>
+      
+
+      {/* Table Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        {loading ? (
+          <div className="animate-pulse bg-gray-100 dark:bg-gray-700 h-64" />
+        ) : (
+          <TradesTable trades={trades} refreshTrades={fetchTrades} darkMode={darkMode} />
+        )}
       </div>
     </div>
   );

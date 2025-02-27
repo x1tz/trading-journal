@@ -1,46 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Box, CssBaseline, Toolbar } from '@mui/material'; // Added Toolbar import
-import CustomAppBar from './components/AppBar'; // Fixed case sensitivity
-import Sidebar from './components/Sidebar';
+import TopNavigation from './components/TopNavigation';
 import Dashboard from './Dashboard';
 import Calendar from './Calendar';
 import News from './News';
-const App = () => {
-  const [open, setOpen] = useState(true);
 
-  const handleDrawerToggle = () => {
-    setOpen(!open);
+const App = () => {
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Initialize dark mode from localStorage
+  useEffect(() => {
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    setDarkMode(isDark);
+    // Apply class to document element for global dark mode
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
+  // Toggle dark mode and save to localStorage
+  const toggleDarkMode = () => {
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    localStorage.setItem('darkMode', newMode);
+    
+    // Apply class to document element for global dark mode
+    if (newMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   };
 
   return (
     <Router>
-      <Box sx={{ display: 'flex' }}>
-        <CssBaseline />
-        <CustomAppBar open={open} handleDrawerToggle={handleDrawerToggle} />
-        <Sidebar open={open} handleDrawerClose={handleDrawerToggle} />
-        
-        <Box
-          component="main"
-          
-          sx={{
-            flexGrow: 1,
-            transition: 'margin 0.3s ease',
-            marginLeft: open ? '56px' : '56px',
-            width: `calc(100% - ${open ? 56 : 56}px)`,
-            marginTop: '64px', // Add this line to account for app bar height
-            height: 'calc(100vh - 64px)', // Prevent vertical overflow
-            overflow: 'auto', // Enable vertical scrolling
-          }}
-        >
+      <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+        <TopNavigation darkMode={darkMode} />
+        <main className="flex-1">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/calendar" element={<Calendar />} />
-            <Route path="/news" element={<News />} />
+            <Route path="/" element={<Dashboard darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
+            <Route path="/calendar" element={<Calendar darkMode={darkMode} />} />
+            <Route path="/news" element={<News darkMode={darkMode} />} />
           </Routes>
-        </Box>
-
-      </Box>
+        </main>
+      </div>
     </Router>
   );
 };
