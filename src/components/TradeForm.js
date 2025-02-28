@@ -1,42 +1,32 @@
 import React, { useState } from 'react';
 import supabase from '../supabaseClient';
-import {
-  Container,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Checkbox,
-  FormControlLabel,
-  Button,
-  Grid,
-  Typography,
-  Paper
-} from '@mui/material';
+import '../styles/scrollbar.css';
 
-const PAIRS = ['XAU/USD', 'EUR/USD', 'GBP/USD', 'AUD/USD'];
-const ENTRIES = ['FVG', 'OB'];
-const DIRECTIONS = ['ERL', 'IRL'];
-const TIMEFRAMES = ['4H'];
 
-const TradeForm = ({ onSuccess }) => {
+const PAIRS = ['','XAU/USD', 'EUR/USD', 'GBP/USD', 'AUD/USD', 'USD/JPY'];
+const ENTRIES = ['','FVG', 'OB', 'CISD'];
+const DIRECTIONS = ['','ERL', 'IRL'];
+const TIMEFRAMES = ['','4H','1H'];
+const RESULT = ['','Win', 'Loss', 'BE'];
+const TRADE_TYPE = ['','Buy', 'Sell'];
 
+
+const TradeForm = ({ onSuccess, onClose }) => {
   const [formData, setFormData] = useState({
-    pair: PAIRS[0],
-    result: 'win',
-    trade_type: 'buy',
-    direction: DIRECTIONS[0],
+    pair: '',
+    result: '',
+    trade_type: '',
+    direction: '',
     dp: false,
-    entry_type: ENTRIES[0],
+    entry_type: '',
     rr: '',
-    timeframe: TIMEFRAMES[0],
+    timeframe: '',
     open_date: '',
     closure_date: '',
-    url: '',
+    image_before: '',
+    image_after: '',
     comments: '',
   });
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,17 +40,18 @@ const TradeForm = ({ onSuccess }) => {
       if (onSuccess) onSuccess();
       // Reset form
       setFormData({
-        pair: PAIRS[0],
-        result: 'win',
-        trade_type: 'buy',
-        direction: DIRECTIONS[0],
+        pair: '',
+        result: '',
+        trade_type: '',
+        direction: '',
         dp: false,
-        entry_type: ENTRIES[0],
+        entry_type: '',
         rr: '',
-        timeframe: TIMEFRAMES[0],
+        timeframe: '',
         open_date: '',
         closure_date: '',
-        url: '',
+        image_before: '',
+        image_after: '',
         comments: '',
       });
     }
@@ -75,219 +66,264 @@ const TradeForm = ({ onSuccess }) => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4 }}>
-      <Paper elevation={3} sx={{ p: 3 }}>
-        <Typography variant="h4" gutterBottom>Add New Trade</Typography>
-        
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            {/* Trade Basics */}
-            <Grid item xs={12}>
-              <Typography variant="h6">Trade Details</Typography>
-            </Grid>
+    
 
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth>
-                <InputLabel>Currency Pair</InputLabel>
-                <Select
-                  name="pair"
-                  value={formData.pair}
-                  onChange={handleChange}
-                  label="Currency Pair"
-                  required
-                >
-                  {PAIRS.map(pair => (
-                    <MenuItem key={pair} value={pair}>
-                      {pair}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+      <div className="max-w-4xl mx-auto mt-8 px-4 custom-scrollbar " style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Add New Trade</h1>
+          
+          <form onSubmit={handleSubmit} className="space-y-8 ">
+            {/* Trade Details Section */}
+            <div>
+              <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                Trade Details
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Currency Pair
+                  </label>
+                  <select
+                    name="pair"
+                    value={formData.pair}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  >
+                    {PAIRS.map(pair => (
+                      <option key={pair} value={pair}>
+                        {pair}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth>
-                <InputLabel>Win/Loss</InputLabel>
-                <Select
-                  name="result"
-                  value={formData.result}
-                  onChange={handleChange}
-                  label="Result"
-                >
-                  <MenuItem value="Win">Win</MenuItem>
-                  <MenuItem value="Loss">Loss</MenuItem>
-                  <MenuItem value="BE">BE</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Win/Loss
+                  </label>
+                  <select
+                    name="result"
+                    value={formData.result}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  >
+                    {RESULT.map(tf => (
+                      <option key={tf} value={tf}>
+                        {tf}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            {/* Trade Type & Direction */}
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth>
-                <InputLabel>Trade Type</InputLabel>
-                <Select
-                  name="trade_type"
-                  value={formData.trade_type}
-                  onChange={handleChange}
-                  label="Trade Type"
-                >
-                  <MenuItem value="Buy">Buy</MenuItem>
-                  <MenuItem value="Sell">Sell</MenuItem>
-                  
-                </Select>
-              </FormControl>
-            </Grid>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Trade Type
+                  </label>
+                  <select
+                    name="trade_type"
+                    value={formData.trade_type}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  >
+                    {TRADE_TYPE.map(tf => (
+                      <option key={tf} value={tf}>
+                        {tf}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth>
-                <InputLabel>Direction</InputLabel>
-                <Select
-                  name="direction"
-                  value={formData.direction}
-                  onChange={handleChange}
-                  label="Direction"
-                >
-                  {DIRECTIONS.map(direction => (
-                    <MenuItem key={direction} value={direction}>
-                      {direction}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Direction
+                  </label>
+                  <select
+                    name="direction"
+                    value={formData.direction}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  >
+                    {DIRECTIONS.map(direction => (
+                      <option key={direction} value={direction}>
+                        {direction}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            <Grid item xs={12} md={6}>
-              <FormControlLabel
-                control={
-                  <Checkbox
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Entry Type
+                  </label>
+                  <select
+                    name="entry_type"
+                    value={formData.entry_type}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  >
+                    {ENTRIES.map(entry => (
+                      <option key={entry} value={entry}>
+                        {entry}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Timeframe
+                  </label>
+                  <select
+                    name="timeframe"
+                    value={formData.timeframe}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  >
+                    {TIMEFRAMES.map(tf => (
+                      <option key={tf} value={tf}>
+                        {tf}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
                     name="dp"
                     checked={formData.dp}
                     onChange={handleChange}
-                    color="primary"
+                    className="h-4 w-4 text-indigo-600 dark:text-indigo-500 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded"
                   />
-                }
-                label="Discount/Premium"
-              />
-            </Grid>
+                  <label className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                    Discount/Premium
+                  </label>
+                </div>
 
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth>
-                <InputLabel>Entry Type</InputLabel>
-                <Select
-                  name="entry_type"
-                  value={formData.entry_type}
+
+              </div>
+            </div>
+
+            {/* Risk Management Section */}
+            <div>
+              <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                Risk Management
+              </h2>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Risk/Reward Ratio
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  name="rr"
+                  value={formData.rr}
                   onChange={handleChange}
-                  label="Entry Type"
-                >
-                  {ENTRIES.map(entry => (
-                    <MenuItem key={entry} value={entry}>
-                      {entry}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+                  className="w-full md:w-1/2 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+            </div>
 
-            {/* Risk Management */}
-            <Grid item xs={12}>
-              <Typography variant="h6">Risk Management</Typography>
-            </Grid>
+            {/* Timing Section */}
+            <div>
+              <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                Timing
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Open Date & Time
+                  </label>
+                  <input
+                    type="datetime-local"
+                    name="open_date"
+                    value={formData.open_date}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
 
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Risk/Reward Ratio"
-                name="rr"
-                type="number"
-                inputProps={{ step: "0.1" }}
-                value={formData.rr}
-                onChange={handleChange}
-              />
-            </Grid>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Closure Date & Time
+                  </label>
+                  <input
+                    type="datetime-local"
+                    name="closure_date"
+                    value={formData.closure_date}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+            </div>
 
-            {/* Timing */}
-            <Grid item xs={12}>
-              <Typography variant="h6">Timing</Typography>
-            </Grid>
+            {/* Additional Information Section */}
+            <div>
+              <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                Additional Information
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Image Before
+                  </label>
+                  <input
+                    type="text"
+                    name="image_before"
+                    value={formData.image_before}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
 
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Open Date & Time"
-                type="datetime-local"
-                name="open_date"
-                value={formData.open_date}
-                onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Image After
+                  </label>
+                  <input
+                    type="text"
+                    name="image_after"
+                    value={formData.image_after}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
 
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Closure Date & Time"
-                type="datetime-local"
-                name="closure_date"
-                value={formData.closure_date}
-                onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
+              </div>
 
-            {/* Additional Info */}
-            <Grid item xs={12}>
-              <Typography variant="h6">Additional Information</Typography>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Screenshot URL"
-                name="url"
-                value={formData.url}
-                onChange={handleChange}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth>
-                <InputLabel>Timeframe</InputLabel>
-                <Select
-                  name="timeframe"
-                  value={formData.timeframe}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Comments
+                </label>
+                <textarea
+                  name="comments"
+                  value={formData.comments}
                   onChange={handleChange}
-                  label="Timeframe"
-                >
-                  {TIMEFRAMES.map(tf => (
-                    <MenuItem key={tf} value={tf}>
-                      {tf}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+                  rows="4"
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                ></textarea>
+              </div>
+            </div>
 
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Comments"
-                name="comments"
-                value={formData.comments}
-                onChange={handleChange}
-                multiline
-                rows={4}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Button type="submit" variant="contained" color="primary" size="large">
+            {/* Submit Button */}
+            <div>
+              <button
+                type="submit"
+                className="px-6 py-3 bg-indigo-600 dark:bg-indigo-500 text-white font-medium rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors"
+              >
                 Add Trade
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </Paper>
-    </Container>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
   );
 };
 

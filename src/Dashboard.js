@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import supabase from './supabaseClient';
 import TradesTable from './components/TradesTable';
 import ResultsChart from './components/ResultsChart';
+import CalendarView from './components/CalendarView';
+import { Heading3 } from 'lucide-react';
 
 const Dashboard = ({ darkMode, toggleDarkMode }) => {
   const [trades, setTrades] = useState([]);
@@ -104,14 +106,28 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
       
 
       {/* Table Section */}
+      {loading ? (
+        <div className="animate-pulse bg-gray-100 dark:bg-gray-700 h-64" />
+      ) : (
+        <TradesTable trades={trades} refreshTrades={fetchTrades} darkMode={darkMode} />
+      )}
+        
+      {/* Add margin between table and calendar */}
+      <div className="mb-8"></div>
+
+      {/* Add Calendar View Section Here */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+          Trading Calendar
+        </h3>
         {loading ? (
-          <div className="animate-pulse bg-gray-100 dark:bg-gray-700 h-64" />
+          <div className="animate-pulse bg-gray-100 dark:bg-gray-700 h-64 rounded-xl" />
         ) : (
-          <TradesTable trades={trades} refreshTrades={fetchTrades} darkMode={darkMode} />
+          <CalendarView trades={trades} darkMode={darkMode} />
         )}
       </div>
     </div>
+    
   );
 };
 

@@ -4,6 +4,7 @@ import TopNavigation from './components/TopNavigation';
 import Dashboard from './Dashboard';
 import Calendar from './Calendar';
 import News from './News';
+import './styles/scrollbar.css';
 
 const App = () => {
   const [darkMode, setDarkMode] = useState(false);
