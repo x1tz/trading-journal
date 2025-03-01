@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay } from 'date-fns';
-import { data } from 'react-router-dom';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 
 const CalendarView = ({ trades }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -27,7 +26,15 @@ const CalendarView = ({ trades }) => {
     
     // Add empty cells for days before month start
     for (let i = 0; i < startDay; i++) {
-      grid.push(<div key={`empty-${i}`} className="px-3 py-2"></div>);
+      grid.push(
+        <div 
+          key={`empty-${i}`} 
+          className="group m-1 flex h-16 flex-col items-end justify-between rounded-md px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+        >
+          <span className="font-bold text-transparent">0</span>
+          <span className="hidden text-xs font-light md:block text-transparent">0</span>
+        </div>
+      );
     }
 
     // Add actual days of the month
@@ -37,15 +44,15 @@ const CalendarView = ({ trades }) => {
       const profit = hasTrade ? tradeData[dateKey].profit : 0;
       
       // Determine background and text color based on profit
-      let bgColorClass = 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700';
+      let bgColorClass = 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600';
       let textColorClass = 'text-gray-500 group-hover:text-gray-700 dark:text-slate-200 dark:group-hover:text-white';
       
       if (hasTrade) {
         if (profit > 0) {
-          bgColorClass = 'bg-green-100 hover:bg-blue-600 dark:bg-green-800';
+          bgColorClass = 'bg-green-100 hover:bg-blue-600 dark:bg-green-800 dark:hover:bg-blue-600';
           textColorClass = 'text-green-500 group-hover:text-white dark:text-green-300';
         } else if (profit < 0) {
-          bgColorClass = 'bg-red-100 hover:bg-blue-600 dark:bg-red-800';
+          bgColorClass = 'bg-red-100 hover:bg-blue-600 dark:bg-red-800 dark:hover:bg-blue-600';
           textColorClass = 'text-red-500 group-hover:text-white dark:text-red-300';
         }
       }
@@ -53,16 +60,14 @@ const CalendarView = ({ trades }) => {
       grid.push(
         <div
           key={dateKey}
-          className={`group m-1 flex cursor-pointer flex-col items-end justify-between rounded-md px-3 py-2 ${bgColorClass}`}
+          className={`group m-1 flex h-16 cursor-pointer flex-col items-end justify-between rounded-md px-3 py-2 ${bgColorClass}`}
         >
           <span className={`font-bold ${textColorClass}`}>
             {format(date, 'd')}
           </span>
-          {hasTrade && (
-            <span className={`hidden text-xs font-light md:block ${textColorClass}`}>
-              {tradeData[dateKey].profit} R
-            </span>
-          )}
+          <span className={`hidden text-xs font-light md:block ${hasTrade ? textColorClass : 'text-transparent'}`}>
+            {hasTrade ? `${tradeData[dateKey].profit} R` : "0 R"}
+          </span>
         </div>
       );
     });
@@ -71,7 +76,7 @@ const CalendarView = ({ trades }) => {
   };
 
   return (
-    <div className="col-span-2 rounded-2xl bg-white px-5 py-5 dark:bg-gray-900">
+    <div className="col-span-2 rounded-2xl bg-white px-5 py-5 dark:bg-gray-800">
       <div className="mb-5 flex items-center justify-between">
         <div className="text-center text-lg font-medium text-gray-500 dark:text-slate-200">
           {format(currentDate, 'MMMM yyyy')}
@@ -100,7 +105,7 @@ const CalendarView = ({ trades }) => {
           <button
             type="button"
             onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))}
-            className="group flex items-center justify-center rounded-lg rounded-l-none border-l-0 border-gray-200 bg-white p-0.5 pl-0 text-center font-medium text-gray-900 enabled:hover:bg-gray-100 enabled:hover:text-cyan-700 focus:z-10 focus:outline-none focus:ring-2 focus:ring-cyan-700 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-slate-200 dark:enabled:hover:bg-gray-700 dark:enabled:hover:text-white"
+            className="group flex items-center justify-center rounded-lg rounded-l-none border border-t border-b border-r border-gray-200 bg-white p-0.5 pl-0 text-center font-medium text-gray-900 enabled:hover:bg-gray-100 enabled:hover:text-cyan-700 focus:z-10 focus:outline-none focus:ring-2 focus:ring-cyan-700 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-slate-200 dark:enabled:hover:bg-gray-700 dark:enabled:hover:text-white"
           >
             <span className="flex items-center rounded-md rounded-l-none px-4 py-2 text-sm transition-all duration-200">
               <svg

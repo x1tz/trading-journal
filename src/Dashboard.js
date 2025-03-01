@@ -3,7 +3,7 @@ import supabase from './supabaseClient';
 import TradesTable from './components/TradesTable';
 import ResultsChart from './components/ResultsChart';
 import CalendarView from './components/CalendarView';
-import { Heading3 } from 'lucide-react';
+import { BarChart2, TrendingUp, Percent } from 'lucide-react';
 
 const Dashboard = ({ darkMode, toggleDarkMode }) => {
   const [trades, setTrades] = useState([]);
@@ -42,11 +42,12 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
       : 0;
 
     const totalRR = trades.reduce((sum, trade) => sum + (parseFloat(trade.rr) || 0), 0).toFixed(1);
-    const avgRR = trades.length > 0 ? (totalRR / trades.length).toFixed(2) : 0;
+    //const avgRR = trades.length > 0 ? (totalRR / trades.length).toFixed(2) : 0;
 
     return { totalTrades, winRate, totalRR, chartData };
   };
 
+  
   const stats = calculateStats();
 
   return (
@@ -65,35 +66,59 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
           Array(4).fill().map((_, i) => (
             <div 
               key={i} 
-              className="animate-pulse bg-gray-100 dark:bg-gray-800 rounded-xl h-32"
+              className="animate-pulse bg-gray-100 dark:bg-gray-800 rounded-xl h-20"
             />
           ))
         ) : (
           <>
+            {/* Total Trades Card */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md">
-              <div className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-2">
-                Total Trades
-              </div>
-              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                {stats.totalTrades}
+              <div className="flex items-center">
+                <div className="bg-blue-100 dark:bg-blue-900 p-2 rounded-lg mr-3">
+                  <BarChart2 className="text-blue-600 dark:text-blue-400" size={20} />
+                </div>
+                <div>
+                  <div className="text-gray-500 dark:text-gray-400 text-xs font-medium">
+                    Total Trades
+                  </div>
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    {stats.totalTrades}
+                  </div>
+                </div>
               </div>
             </div>
 
+            {/* Win Rate Card */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md">
-              <div className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-2">
-                Win Rate
-              </div>
-              <div className="text-3xl font-bold text-green-600 dark:text-green-400">
-                {stats.winRate}%
+              <div className="flex items-center">
+                <div className="bg-green-100 dark:bg-green-900 p-2 rounded-lg mr-3">
+                  <Percent className="text-green-600 dark:text-green-400" size={20} />
+                </div>
+                <div>
+                  <div className="text-gray-500 dark:text-gray-400 text-xs font-medium">
+                    Win Rate
+                  </div>
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    {stats.winRate}%
+                  </div>
+                </div>
               </div>
             </div>
 
+            {/* Total R:R Card */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md">
-              <div className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-2">
-                Total R:R
-              </div>
-              <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-                {stats.totalRR}
+              <div className="flex items-center">
+                <div className="bg-purple-100 dark:bg-purple-900 p-2 rounded-lg mr-3">
+                  <TrendingUp className="text-purple-600 dark:text-purple-400" size={20} />
+                </div>
+                <div>
+                  <div className="text-gray-500 dark:text-gray-400 text-xs font-medium">
+                    Total R:R
+                  </div>
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    {stats.totalRR}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -116,18 +141,14 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
       <div className="mb-8"></div>
 
       {/* Add Calendar View Section Here */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-        <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
-          Trading Calendar
-        </h3>
+      {/*<div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">*/}
+        
         {loading ? (
           <div className="animate-pulse bg-gray-100 dark:bg-gray-700 h-64 rounded-xl" />
         ) : (
           <CalendarView trades={trades} darkMode={darkMode} />
         )}
       </div>
-    </div>
-    
   );
 };
 

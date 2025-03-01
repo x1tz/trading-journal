@@ -11,32 +11,48 @@ const RESULT = ['','Win', 'Loss', 'BE'];
 const TRADE_TYPE = ['','Buy', 'Sell'];
 
 
-const TradeForm = ({ onSuccess, onClose }) => {
+const TradeForm = ({ onSuccess, onClose, trade }) => {
   const [formData, setFormData] = useState({
-    pair: '',
-    result: '',
-    trade_type: '',
-    direction: '',
-    dp: false,
-    entry_type: '',
-    rr: '',
-    timeframe: '',
-    open_date: '',
-    closure_date: '',
-    image_before: '',
-    image_after: '',
-    comments: '',
+    pair: trade ? trade.pair : '',
+    result: trade ? trade.result : '',
+    trade_type: trade ? trade.trade_type : '',
+    direction: trade ? trade.direction : '',
+    dp: trade ? trade.dp : false,
+    entry_type: trade ? trade.entry_type : '',
+    rr: trade ? trade.rr : '',
+    timeframe: trade ? trade.timeframe : '',
+    open_date: trade ? trade.open_date : '',
+    closure_date: trade ? trade.closure_date : '',
+    image_before: trade ? trade.image_before : '',
+    image_after: trade ? trade.image_after : '',
+    comments: trade ? trade.comments : '',
   });
-
+  
+  // For editing, we need to modify the submit function
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const { data, error } = await supabase.from('trades').insert([formData]);
+    let result;
+    
+    if (trade) {
+      // Update existing trade
+      result = await supabase
+        .from('trades')
+        .update(formData)
+        .eq('id', trade.id);
+    } else {
+      // Insert new trade
+      result = await supabase
+        .from('trades')
+        .insert([formData]);
+    }
+    
+    const { data, error } = result;
 
     if (error) {
-      console.error('Error inserting trade:', error);
+      console.error('Error with trade:', error);
     } else {
-      console.log('Trade inserted:', data);
+      console.log('Trade operation successful:', data);
       if (onSuccess) onSuccess();
       // Reset form
       setFormData({
@@ -56,6 +72,8 @@ const TradeForm = ({ onSuccess, onClose }) => {
       });
     }
   };
+  
+  // Rest of the component stays the same...
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -68,7 +86,8 @@ const TradeForm = ({ onSuccess, onClose }) => {
   return (
     
 
-      <div className="max-w-4xl mx-auto mt-8 px-4 custom-scrollbar " style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+      <div className="max-w-4xl mx-auto mt-8 px-4 custom-scrollbar ">
+
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700">
           <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Add New Trade</h1>
           
@@ -317,7 +336,7 @@ const TradeForm = ({ onSuccess, onClose }) => {
                 type="submit"
                 className="px-6 py-3 bg-indigo-600 dark:bg-indigo-500 text-white font-medium rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors"
               >
-                Add Trade
+                {trade ? 'Update Trade' : 'Add Trade'}
               </button>
             </div>
           </form>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, Wallet } from 'lucide-react';
 
 const TopNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,18 +25,19 @@ const TopNavigation = () => {
 
   return (
     <nav className="bg-gray-800 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo and brand */}
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center h-16">
+          {/* Logo and brand - remove padding to move leftmost */}
+          <div className="flex-shrink-0 pl-4">
+            <Link to="/" className="flex items-center space-x-2">
+              <Wallet className="h-6 w-6 text-white" />
               <h1 className="text-xl font-bold">Trading Journal</h1>
-            </div>
+            </Link>
           </div>
-          
-          {/* Desktop menu */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-center space-x-4">
+            
+          {/* Desktop menu - Directly after the title */}
+          <div className="hidden md:block ml-6">
+            <div className="flex items-center space-x-4">
               {navItems.map((item) => (
                 <Link
                   key={item.name}
@@ -50,39 +51,42 @@ const TopNavigation = () => {
                   {item.name}
                 </Link>
               ))}
+            </div>
+          </div>
+          
+          {/* Spacer to push user dropdown to the right */}
+          <div className="flex-grow"></div>
+          
+          {/* User dropdown - At the far right */}
+          <div className="hidden md:block pr-4">
+            <div className="relative">
+              <button
+                onClick={toggleMenu}
+                className="flex items-center text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md"
+              >
+                <span>User</span>
+                <ChevronDown className="ml-1 h-4 w-4" />
+              </button>
               
-              {/* User dropdown */}
-              <div className="relative ml-3">
-                <div>
-                  <button
-                    onClick={toggleMenu}
-                    className="flex items-center text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md"
-                  >
-                    <span>User</span>
-                    <ChevronDown className="ml-1 h-4 w-4" />
-                  </button>
+              {isOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg py-1 z-10">
+                  {dropdownItems.map((item) => (
+                    <Link
+                      key={item.name}
+                      to={item.path}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
                 </div>
-                
-                {isOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg py-1 z-10">
-                    {dropdownItems.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.path}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           </div>
           
           {/* Mobile menu button */}
-          <div className="md:hidden">
+          <div className="md:hidden ml-auto pr-4">
             <button
               onClick={toggleMenu}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
