@@ -5,6 +5,23 @@ import ResultsChart from './components/ResultsChart';
 import CalendarView from './components/CalendarView';
 import { BarChart2, TrendingUp, Percent } from 'lucide-react';
 
+// Flexible Stat Card Component
+const StatCard = ({ icon: Icon, iconColor, iconBgColor, label, value, valueColor }) => (
+  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md flex items-center p-4 h-20 w-40">
+    <div className={`${iconBgColor} p-1 rounded-lg mr-2 flex items-center justify-center`}>
+      <Icon className={iconColor} size={24} />
+    </div>
+    <div>
+      <div className="text-gray-500 dark:text-gray-400 text-xs leading-none mb-0.5">
+        {label}
+      </div>
+      <div className={`text-xl font-bold ${valueColor} leading-tight`}>
+        {value}
+      </div>
+    </div>
+  </div>
+);
+
 const Dashboard = ({ darkMode, toggleDarkMode }) => {
   const [trades, setTrades] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -46,7 +63,6 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
 
     return { totalTrades, winRate, totalRR, chartData };
   };
-
   
   const stats = calculateStats();
 
@@ -60,76 +76,59 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
         {darkMode ? '🌞' : '🌙'}
       </button>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        {loading ? (
-          Array(4).fill().map((_, i) => (
-            <div 
-              key={i} 
-              className="animate-pulse bg-gray-100 dark:bg-gray-800 rounded-xl h-20"
-            />
-          ))
-        ) : (
-          <>
-            {/* Total Trades Card */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md">
-              <div className="flex items-center">
-                <div className="bg-blue-100 dark:bg-blue-900 p-2 rounded-lg mr-3">
-                  <BarChart2 className="text-blue-600 dark:text-blue-400" size={20} />
+      {/* Flexible Stats Section */}
+      <div className="mb-6">
+        <div className="flex flex-wrap gap-3">
+          {loading ? (
+            <>
+              <div className="animate-pulse bg-gray-100 dark:bg-gray-800 rounded-xl h-10 w-36" />
+              <div className="animate-pulse bg-gray-100 dark:bg-gray-800 rounded-xl h-10 w-36" />
+              <div className="animate-pulse bg-gray-100 dark:bg-gray-800 rounded-xl h-10 w-36" />
+              <div className="animate-pulse bg-gray-100 dark:bg-gray-800 rounded-xl h-40 w-full md:w-48 mt-3" />
+            </>
+          ) : (
+            <>
+              <div className="flex flex-wrap gap-3 items-start">
+                {/* Stat cards wrapper */}
+                <div className="flex flex-wrap gap-3">
+                  <StatCard
+                    icon={BarChart2}
+                    iconColor="text-blue-600 dark:text-blue-400"
+                    iconBgColor="bg-blue-100 dark:bg-blue-900"
+                    label="Total Trades"
+                    value={stats.totalTrades}
+                    valueColor="text-blue-600 dark:text-blue-400"
+                  />
+                  
+                  <StatCard
+                    icon={Percent}
+                    iconColor="text-green-600 dark:text-green-400"
+                    iconBgColor="bg-green-100 dark:bg-green-900"
+                    label="Win Rate"
+                    value={`${stats.winRate}%`}
+                    valueColor="text-green-600 dark:text-green-400"
+                  />
+                  
+                  <StatCard
+                    icon={TrendingUp}
+                    iconColor="text-purple-600 dark:text-purple-400"
+                    iconBgColor="bg-purple-100 dark:bg-purple-900"
+                    label="Total R:R"
+                    value={stats.totalRR}
+                    valueColor="text-purple-600 dark:text-purple-400"
+                  />
                 </div>
-                <div>
-                  <div className="text-gray-500 dark:text-gray-400 text-xs font-medium">
-                    Total Trades
-                  </div>
-                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    {stats.totalTrades}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Win Rate Card */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md">
-              <div className="flex items-center">
-                <div className="bg-green-100 dark:bg-green-900 p-2 rounded-lg mr-3">
-                  <Percent className="text-green-600 dark:text-green-400" size={20} />
-                </div>
-                <div>
-                  <div className="text-gray-500 dark:text-gray-400 text-xs font-medium">
-                    Win Rate
-                  </div>
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {stats.winRate}%
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Total R:R Card */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md">
-              <div className="flex items-center">
-                <div className="bg-purple-100 dark:bg-purple-900 p-2 rounded-lg mr-3">
-                  <TrendingUp className="text-purple-600 dark:text-purple-400" size={20} />
-                </div>
-                <div>
-                  <div className="text-gray-500 dark:text-gray-400 text-xs font-medium">
-                    Total R:R
-                  </div>
-                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                    {stats.totalRR}
-                  </div>
+                
+                {/* Chart */}
+                <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 h-40 w-full md:w-64 flex-shrink-0 mt-3 md:mt-0">
+                  <ResultsChart data={stats.chartData} darkMode={darkMode} />
                 </div>
               </div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 h-48">
-              <ResultsChart data={stats.chartData} darkMode={darkMode} />
-            </div>
-          </>
-        )}
+            </>
+          )}
+        </div>
       </div>
       
-
       {/* Table Section */}
       {loading ? (
         <div className="animate-pulse bg-gray-100 dark:bg-gray-700 h-64" />
@@ -141,14 +140,12 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
       <div className="mb-8"></div>
 
       {/* Add Calendar View Section Here */}
-      {/*<div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">*/}
-        
-        {loading ? (
-          <div className="animate-pulse bg-gray-100 dark:bg-gray-700 h-64 rounded-xl" />
-        ) : (
-          <CalendarView trades={trades} darkMode={darkMode} />
-        )}
-      </div>
+      {loading ? (
+        <div className="animate-pulse bg-gray-100 dark:bg-gray-700 h-64 rounded-xl" />
+      ) : (
+        <CalendarView trades={trades} darkMode={darkMode} />
+      )}
+    </div>
   );
 };
 
